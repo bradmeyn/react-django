@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-kb&*5&5t-_$+p&g+*@54uikru)k#!4*v)_keg#k1=po8grn9fk
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+
 
 
 # Application definition
@@ -37,9 +37,25 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Internal
+    'clients',
+
+    # Libraries
+    'corsheaders',
+    'rest_framework'
 ]
 
+# Configure DRF settings
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',  # For JSON responses
+        'rest_framework.renderers.BrowsableAPIRenderer',  # For the browsable API
+    ]
+}
+
 MIDDLEWARE = [
+     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -47,6 +63,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+ALLOWED_HOSTS = [
+    '0.0.0.0',
+    '0.0.0.0:8000',
+    'localhost'
 ]
 
 ROOT_URLCONF = 'app.urls'
