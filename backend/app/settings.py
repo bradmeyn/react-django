@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     # Internal
     'clients',
+    'accounts',
 
     # Libraries
     'corsheaders',
@@ -70,7 +71,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 ALLOWED_HOSTS = [
     '0.0.0.0',
     '0.0.0.0:8000',
-    'localhost'
+    'localhost',
+    '127.0.0.1'
 ]
 
 ROOT_URLCONF = 'app.urls'
@@ -99,11 +101,16 @@ WSGI_APPLICATION = 'app.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'mydatabase',
+        'USER': 'myuser',
+        'PASSWORD': 'mypassword',
+        'HOST': 'db',  
+        'PORT': '5432',
     }
 }
 
+AUTH_USER_MODEL = 'accounts.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

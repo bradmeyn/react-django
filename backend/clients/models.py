@@ -1,4 +1,5 @@
 from django.db import models
+from accounts.models import Practice
 import uuid
 
 class Client(models.Model):
@@ -10,7 +11,11 @@ class Client(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
-
+    practice = models.ForeignKey(
+        'accounts.Practice',  # Update this reference
+        on_delete=models.CASCADE,
+        related_name='clients'
+    )
 
     class Meta:
         ordering = ['-created_at']
