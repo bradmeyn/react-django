@@ -9,7 +9,6 @@ class Practice(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -26,7 +25,6 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-# accounts/models.py
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     username = None
@@ -42,7 +40,6 @@ class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # Add these related_name attributes to fix the conflicts
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='custom_user_set',

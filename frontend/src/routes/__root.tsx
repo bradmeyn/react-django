@@ -1,16 +1,12 @@
 import * as React from "react";
-import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 
-export const Route = createRootRoute({
-  component: RootComponent,
-});
+import { type AuthContext } from "@/lib/contexts/AuthContext";
 
-function RootComponent() {
-  return (
-    <>
-      <Outlet />
-      <TanStackRouterDevtools position="bottom-right" />
-    </>
-  );
+interface RouterContext {
+  auth: AuthContext;
 }
+
+export const Route = createRootRouteWithContext<RouterContext>()({
+  component: () => <Outlet />,
+});

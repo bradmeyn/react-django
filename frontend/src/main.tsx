@@ -1,3 +1,4 @@
+import { AuthProvider, useAuth } from "@contexts/AuthContext";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
@@ -11,9 +12,14 @@ const queryClient = new QueryClient();
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",
+  context: {
+    auth: {
+      user: null,
+      isAuthenticated: false,
+    },
+  },
 });
 
-// Register things for typesafety
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
@@ -22,11 +28,18 @@ declare module "@tanstack/react-router" {
 
 const rootElement = document.getElementById("app")!;
 
+function InnerApp() {
+  const auth = useAuth();
+  return <RouterProvider router={router} context={{ auth }} />;
+}
+
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <InnerApp />
+      </QueryClientProvider>
+    </AuthProvider>
   );
 }

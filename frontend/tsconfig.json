@@ -10,10 +10,11 @@
     "paths": {
       "@/*": ["./src/*"],
       "@components/*": ["./src/lib/components/*"],
+      "@contexts/*": ["./src/lib/contexts/*"],
       "@hooks/*": ["./src/lib/hooks/*"],
       "@utils/*": ["./src/lib/utils/*"],
       "@schemas/*": ["./src/lib/schemas/*"],
-      "@services/*": ["./src/lib/services/*"],
+      "@services/*": ["./src/lib/services/*"]
     }
   }
 }

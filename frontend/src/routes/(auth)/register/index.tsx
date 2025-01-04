@@ -30,7 +30,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 
 import { registerSchema } from "@schemas/auth";
-import { registerPractice } from "@services/auth";
+import { register } from "@services/auth";
 
 import { cn } from "@utils/shadcn";
 
@@ -42,8 +42,8 @@ function RegisterPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const { data, error, mutateAsync } = useMutation({
-    mutationFn: registerPractice,
+  const { mutateAsync } = useMutation({
+    mutationFn: register,
     onSuccess: () => {
       navigate({ to: "/login" });
     },
@@ -61,11 +61,11 @@ function RegisterPage() {
     mode: "onBlur",
     defaultValues: {
       email: "",
-      businessName: "",
-      firstName: "",
-      lastName: "",
+      practice_name: "",
+      first_name: "",
+      last_name: "",
       password: "",
-      confirmPassword: "",
+      confirm_password: "",
     },
   });
 
@@ -137,7 +137,7 @@ function RegisterPage() {
 
                   <FormField
                     control={form.control}
-                    name="businessName"
+                    name="practice_name"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Business Name</FormLabel>
@@ -159,7 +159,7 @@ function RegisterPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name="firstName"
+                      name="first_name"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>First Name</FormLabel>
@@ -173,7 +173,7 @@ function RegisterPage() {
 
                     <FormField
                       control={form.control}
-                      name="lastName"
+                      name="last_name"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Last Name</FormLabel>
@@ -206,7 +206,7 @@ function RegisterPage() {
 
                   <FormField
                     control={form.control}
-                    name="confirmPassword"
+                    name="confirm_password"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Confirm Password</FormLabel>
