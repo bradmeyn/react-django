@@ -69,6 +69,15 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
+    
+    # Add cookie settings
+    'AUTH_COOKIE_ACCESS': 'access_token',  # Cookie name for access token
+    'AUTH_COOKIE_REFRESH': 'refresh_token',  # Cookie name for refresh token
+    'AUTH_COOKIE_DOMAIN': None,  # Use None for standard domain cookie
+    'AUTH_COOKIE_SECURE': False,  # Set to True in production with HTTPS
+    'AUTH_COOKIE_HTTP_ONLY': True,  # Prevents JavaScript access
+    'AUTH_COOKIE_PATH': '/',  # Cookie path
+    'AUTH_COOKIE_SAMESITE': 'Lax',  # 'Lax', 'Strict', or 'None'
 }
 
 MIDDLEWARE = [
@@ -82,7 +91,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Your frontend development server
+    "http://172.19.0.2:5173",  # Your Docker network address (if needed)
+    # Add production URLs as needed
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 
 ALLOWED_HOSTS = [
     '0.0.0.0',

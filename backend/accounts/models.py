@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 import uuid
 
-class Practice(models.Model):
+class Business(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -29,13 +29,7 @@ class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     username = None
     email = models.EmailField(unique=True)
-    practice = models.ForeignKey(Practice, on_delete=models.CASCADE, related_name='practice_users')
-    role = models.CharField(max_length=50, choices=[
-        ('SUPER_ADMIN', 'Super Administrator'),
-        ('ADMIN', 'Administrator'),
-        ('STAFF', 'Staff'),
-        ('VIEWER', 'Viewer'),
-    ], default="STAFF")
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_users')
     phone = models.CharField(max_length=50, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

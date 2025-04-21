@@ -61,7 +61,7 @@ function RegisterPage() {
     mode: "onBlur",
     defaultValues: {
       email: "",
-      practice_name: "",
+      business_name: "",
       first_name: "",
       last_name: "",
       password: "",
@@ -82,7 +82,7 @@ function RegisterPage() {
     <div className="min-h-screen bg-muted">
       <header className="py-6 px-8 border-b bg-background">
         <Link to="/" className="text-xl font-bold">
-          AdviceRM
+          Rolodex
         </Link>
       </header>
 
@@ -96,7 +96,7 @@ function RegisterPage() {
           <CardHeader className="space-y-4">
             <CardTitle className="text-2xl">Get Started</CardTitle>
             <CardDescription>
-              Get started with your practice management portal
+              Get started with your business management portal
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -137,7 +137,7 @@ function RegisterPage() {
 
                   <FormField
                     control={form.control}
-                    name="practice_name"
+                    name="business_name"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Business Name</FormLabel>
@@ -145,7 +145,7 @@ function RegisterPage() {
                           <Building2 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                           <FormControl>
                             <Input
-                              placeholder="Your practice name"
+                              placeholder="Your business name"
                               className="pl-9"
                               {...field}
                             />
@@ -232,7 +232,7 @@ function RegisterPage() {
                     form.formState.isDirty
                   }
                 >
-                  Create Practice
+                  Create business
                 </Button>
               </form>
             </Form>

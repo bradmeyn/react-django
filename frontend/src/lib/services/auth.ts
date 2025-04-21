@@ -17,15 +17,17 @@ interface AuthResponse {
     role: string;
     phone: string;
   };
-  tokens: {
-    access: string;
-    refresh: string;
-  };
 }
 
 export async function register(data: z.infer<typeof registerSchema>) {
   try {
     const response = await api.post<AuthResponse>("/register/", data);
+
+    // Store user data
+    if (response.data && response.data.user) {
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+    }
+
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -37,14 +39,19 @@ export async function register(data: z.infer<typeof registerSchema>) {
 
 export async function login(data: z.infer<typeof loginSchema>) {
   try {
-    const response = await api.post<AuthResponse>("/token/", data);
+    console.log("login data", data);
 
-    // Store tokens and user data
-    localStorage.setItem("tokens", JSON.stringify(response.data.tokens));
-    localStorage.setItem("user", JSON.stringify(response.data.user));
+    const response = await api.post<AuthResponse>("/login/", data);
+    console.log("login response", response.data);
+
+    // Store user data only (tokens are in HTTP-only cookies)
+    if (response.data && response.data.user) {
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+    }
 
     return response.data;
   } catch (error) {
+    console.error("Login error:", error);
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.message || "Login failed");
     }
@@ -53,10 +60,19 @@ export async function login(data: z.infer<typeof loginSchema>) {
 }
 
 export async function logout() {
-  localStorage.removeItem("tokens");
-  localStorage.removeItem("user");
+  try {
+    // Call the logout endpoint to clear cookies on the server
+    await api.post("/logout/");
+    // Clear local storage
+    localStorage.removeItem("user");
+    return true;
+  } catch (error) {
+    console.error("Logout error:", error);
+    // Still clear local storage even if the API call fails
+    localStorage.removeItem("user");
+    throw error;
+  }
 }
-
 export async function refreshToken() {
   try {
     const tokens = JSON.parse(localStorage.getItem("tokens") || "{}");

@@ -7,7 +7,7 @@ export const loginSchema = z.object({
 
 export const registerSchema = z
   .object({
-    practice_name: z
+    business_name: z
       .string()
       .min(2, "Business name must be at least 2 characters"),
     first_name: z.string().min(2, "First name must be at least 2 characters"),

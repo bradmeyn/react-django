@@ -7,11 +7,11 @@ export const Route = createFileRoute("/")({
 
 function Header() {
   return (
-    <header className="bg-white shadow-sm dark:bg-neutral-950 dark:text-neutral-50">
+    <header className="bg-white shadow-xs dark:bg-neutral-950 dark:text-neutral-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center font-semibold">
-            <Link href="/">CRM </Link>
+            <Link href="/">Rolodex - Django</Link>
           </div>
           <div className="flex items-center gap-4">
             <Button variant="outline" asChild>
@@ -32,7 +32,7 @@ function Footer() {
     <footer className="bg-white dark:bg-neutral-950 dark:text-neutral-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-center">
-          <a href="/" className="flex-shrink-0">
+          <a href="/" className="shrink-0">
             <img className="h-8 w-auto" src="/logo.svg" alt="Logo" />
           </a>
         </div>
@@ -45,7 +45,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-grow">
+      <main className="grow">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="py-20 text-center">
             <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-6">

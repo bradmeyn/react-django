@@ -6,6 +6,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
+import { set } from "zod";
 
 interface User {
   id: string;
@@ -37,8 +38,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Check localStorage on mount
     const userData = localStorage.getItem("user");
-    if (userData) {
+
+    console.log("userData", userData);
+
+    if (userData && userData !== "undefined") {
       setUser(JSON.parse(userData));
+    } else {
+      setUser(null);
+      setLoading(false);
     }
     setLoading(false);
   }, []);
@@ -46,7 +53,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = {
     user,
     isAuthenticated: !!user && !!localStorage.getItem("tokens"),
-
     loading,
   };
 

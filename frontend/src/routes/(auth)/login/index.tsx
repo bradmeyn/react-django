@@ -41,6 +41,10 @@ function LoginPage() {
     onSuccess: () => {
       navigate({ to: "/dashboard" });
     },
+    onError: (error) => {
+      console.error("Login error", error);
+      // Handle error (e.g., show a notification)
+    },
   });
 
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -53,6 +57,7 @@ function LoginPage() {
   });
 
   async function onSubmit(data: z.infer<typeof loginSchema>) {
+    console.log("login data", data);
     mutation.mutate(data);
   }
 
@@ -60,7 +65,7 @@ function LoginPage() {
     <div className="min-h-screen bg-muted">
       <header className="py-6 px-8 border-b bg-background">
         <Link to="/" className="text-xl font-bold">
-          AdviceRM
+          Rolodex
         </Link>
       </header>
 

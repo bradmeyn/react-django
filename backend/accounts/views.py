@@ -5,20 +5,28 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from .serializers import UserRegistrationSerializer, LoginSerializer, PracticeRegistrationSerializer
+from .serializers import UserRegistrationSerializer, LoginSerializer, BusinessRegistrationSerializer, UserSerializer
 
-from django.core.exceptions import ValidationError
+
 import logging
 
 logger = logging.getLogger(__name__)
 
-class PracticeRegistrationView(APIView):
+class BusinessRegistrationView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        serializer = PracticeRegistrationSerializer(data=request.data)
+        serializer = BusinessRegistrationSerializer(data=request.data)
         if serializer.is_valid():
+            # Create user
             user = serializer.save()
+            
+            # Grant Django admin access
+            user.is_staff = True
+            user.is_superuser = True
+            
+            user.save()
+            
             refresh = RefreshToken.for_user(user)
             
             return Response({
@@ -31,23 +39,7 @@ class PracticeRegistrationView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class LoginView(APIView):
-    permission_classes = [AllowAny]
 
-    def post(self, request):
-        serializer = LoginSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.validated_data['user']
-            refresh = RefreshToken.for_user(user)
-            
-            return Response({
-                'user': UserSerializer(user).data,
-                'tokens': {
-                    'access': str(refresh.access_token),
-                    'refresh': str(refresh)
-                }
-            })
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -93,12 +85,12 @@ class LogoutView(APIView):
         return response
 
 class UserCreateView(APIView):
-    """Protected endpoint for creating additional practice users"""
+    """Protected endpoint for creating additional business users"""
     permission_classes = [IsAuthenticated]  # Only authenticated users can create new users
 
     def post(self, request):
-        # Add the practice from the authenticated user
-        request.data['practice_id'] = request.user.practice.id
+        # Add the business from the authenticated user
+        request.data['business_id'] = request.user.business.id
         
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
