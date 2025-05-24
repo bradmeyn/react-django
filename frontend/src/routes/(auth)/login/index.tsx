@@ -18,15 +18,15 @@ import {
 import { Input } from "@components/ui/input";
 import { Button } from "@components/ui/button";
 import { Mail, Lock } from "lucide-react";
+import { Alert, AlertDescription } from "@components/ui/alert";
+import { useState } from "react";
 
 // Form
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-
 import { loginSchema } from "@schemas/auth";
 import { login } from "@services/auth";
 
@@ -36,6 +36,8 @@ export const Route = createFileRoute("/(auth)/login/")({
 
 function LoginPage() {
   const navigate = useNavigate();
+  const [loginError, setLoginError] = useState("");
+
   const mutation = useMutation({
     mutationFn: login,
     onSuccess: () => {
@@ -43,7 +45,11 @@ function LoginPage() {
     },
     onError: (error) => {
       console.error("Login error", error);
-      // Handle error (e.g., show a notification)
+      // Set error message to display to the user
+      setLoginError(
+        error.message ||
+          "Failed to sign in. Please check your credentials and try again."
+      );
     },
   });
 
@@ -57,7 +63,7 @@ function LoginPage() {
   });
 
   async function onSubmit(data: z.infer<typeof loginSchema>) {
-    console.log("login data", data);
+    setLoginError(""); // Clear any previous errors
     mutation.mutate(data);
   }
 
@@ -78,6 +84,11 @@ function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {loginError && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertDescription>{loginError}</AlertDescription>
+              </Alert>
+            )}
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}

@@ -52,6 +52,7 @@ function RegisterPage() {
       setErrorMessage(null);
     },
     onError: (error) => {
+      console.error(error);
       setErrorMessage(error.message);
     },
   });
@@ -71,6 +72,8 @@ function RegisterPage() {
 
   async function onSubmit(data: z.infer<typeof registerSchema>) {
     try {
+      console.log("Registering user...");
+      console.log(data);
       const result = await mutateAsync(data);
       console.log(result);
     } catch (error) {

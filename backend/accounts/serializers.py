@@ -28,7 +28,6 @@ class BusinessRegistrationSerializer(serializers.ModelSerializer):
         # Create admin user
         user = User.objects.create(
             business=business,
-            role='ADMIN',  
             **validated_data
         )
         user.set_password(validated_data['password'])
@@ -49,7 +48,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'password', 'first_name', 'last_name', 
-                 'business', 'business_id', 'role', 'phone']
+                 'business', 'business_id', 'phone']
         read_only_fields = ['id']
 
     def create(self, validated_data):
@@ -92,5 +91,5 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'first_name', 'last_name', 'business', 'role', 'phone']
+        fields = ['id', 'email', 'first_name', 'last_name', 'business', 'phone']
         # Don't include password in the returned data

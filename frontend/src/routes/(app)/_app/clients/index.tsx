@@ -1,15 +1,7 @@
-import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 
 import { Button } from "@components/ui/button";
-import {
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
-
 import { Input } from "@components/ui/input";
 import {
   Select,
@@ -18,86 +10,53 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/ui/select";
-import AddClientDialog from "./-components/AddClientDialog";
-import ClientTable from "./-components/ClientTable";
+import {
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
+import AddClientDialog from "./-components/add-client-dialog";
+import ClientTable from "./-components/client-list-table";
 
-export const Route = createFileRoute("/(app)/_dashboard/clients/")({
-  component: ClientsPage,
+export const Route = createFileRoute("/(app)/_app/clients/")({
+  component: ClientListPage,
+  errorComponent: () => <div>Error loading clients</div>,
+  loader: () => {
+    // Simulate a data fetching delay
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(null);
+      }, 1000);
+    });
+  },
 });
 
 export interface Client {
   id: string;
+  salutation: string | null;
   firstName: string;
+  preferredName: string | null;
   lastName: string;
   email: string | null;
   phone: string | null;
 }
 
-// Mock client data
-const mockClients: Client[] = [
-  {
-    id: "1",
-    firstName: "Emma",
-    lastName: "Thompson",
-    email: "emma.thompson@email.com",
-    phone: "(555) 123-4567",
-  },
-  {
-    id: "2",
-    firstName: "James",
-    lastName: "Wilson",
-    email: "james.wilson@email.com",
-    phone: "(555) 234-5678",
-  },
-  {
-    id: "3",
-    firstName: "Sophia",
-    lastName: "Garcia",
-    email: "sophia.garcia@email.com",
-    phone: "(555) 345-6789",
-  },
-  {
-    id: "4",
-    firstName: "Michael",
-    lastName: "Chen",
-    email: "michael.chen@email.com",
-    phone: "(555) 456-7890",
-  },
-  {
-    id: "5",
-    firstName: "Isabella",
-    lastName: "Martinez",
-    email: "isabella.martinez@email.com",
-    phone: "(555) 567-8901",
-  },
-];
-
-function ClientsPage() {
-  const [searchTerm, setSearchTerm] = React.useState("");
-
-  const [clients] = React.useState<Client[]>(mockClients);
-  const [currentPage, setCurrentPage] = React.useState(1);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
-  const filteredClients = clients.filter((client) => {
-    const searchString = searchTerm.toLowerCase();
-    return (
-      client.firstName.toLowerCase().includes(searchString) ||
-      client.lastName.toLowerCase().includes(searchString) ||
-      client.email?.toLowerCase().includes(searchString) ||
-      client.phone?.toLowerCase().includes(searchString)
-    );
-  });
+function ClientListPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [clients] = useState<Client[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   // Pagination calculations
-  const totalPages = Math.ceil(filteredClients.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
 
   return (
     <main className="container py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Clients</h1>
+
         <AddClientDialog />
       </div>
 
@@ -111,7 +70,7 @@ function ClientsPage() {
         />
       </div>
 
-      <ClientTable clients={mockClients} />
+      <ClientTable clients={clients} />
 
       <div className="flex items-center justify-between space-x-2 py-4">
         <div className="flex items-center space-x-2">

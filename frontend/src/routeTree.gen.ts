@@ -14,12 +14,13 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
-import { Route as appDashboardImport } from './routes/(app)/_dashboard'
+import { Route as appAppImport } from './routes/(app)/_app'
 import { Route as authRegisterIndexImport } from './routes/(auth)/register/index'
 import { Route as authLoginIndexImport } from './routes/(auth)/login/index'
-import { Route as appDashboardDashboardIndexImport } from './routes/(app)/_dashboard/dashboard/index'
-import { Route as appDashboardClientsIndexImport } from './routes/(app)/_dashboard/clients/index'
-import { Route as appDashboardClientsclientIdIndexImport } from './routes/(app)/_dashboard/clients/[clientId]/index'
+import { Route as appAppDashboardIndexImport } from './routes/(app)/_app/dashboard/index'
+import { Route as appAppClientsIndexImport } from './routes/(app)/_app/clients/index'
+import { Route as appAppClientsClientIdRouteImport } from './routes/(app)/_app/clients/$clientId/route'
+import { Route as appAppClientsClientIdIndexImport } from './routes/(app)/_app/clients/$clientId/index'
 
 // Create Virtual Routes
 
@@ -38,8 +39,8 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const appDashboardRoute = appDashboardImport.update({
-  id: '/_dashboard',
+const appAppRoute = appAppImport.update({
+  id: '/_app',
   getParentRoute: () => appRoute,
 } as any)
 
@@ -55,26 +56,33 @@ const authLoginIndexRoute = authLoginIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const appDashboardDashboardIndexRoute = appDashboardDashboardIndexImport.update(
+const appAppDashboardIndexRoute = appAppDashboardIndexImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => appAppRoute,
+} as any)
+
+const appAppClientsIndexRoute = appAppClientsIndexImport.update({
+  id: '/clients/',
+  path: '/clients/',
+  getParentRoute: () => appAppRoute,
+} as any)
+
+const appAppClientsClientIdRouteRoute = appAppClientsClientIdRouteImport.update(
   {
-    id: '/dashboard/',
-    path: '/dashboard/',
-    getParentRoute: () => appDashboardRoute,
+    id: '/clients/$clientId',
+    path: '/clients/$clientId',
+    getParentRoute: () => appAppRoute,
   } as any,
 )
 
-const appDashboardClientsIndexRoute = appDashboardClientsIndexImport.update({
-  id: '/clients/',
-  path: '/clients/',
-  getParentRoute: () => appDashboardRoute,
-} as any)
-
-const appDashboardClientsclientIdIndexRoute =
-  appDashboardClientsclientIdIndexImport.update({
-    id: '/clients/[clientId]/',
-    path: '/clients/[clientId]/',
-    getParentRoute: () => appDashboardRoute,
-  } as any)
+const appAppClientsClientIdIndexRoute = appAppClientsClientIdIndexImport.update(
+  {
+    id: '/',
+    path: '/',
+    getParentRoute: () => appAppClientsClientIdRouteRoute,
+  } as any,
+)
 
 // Populate the FileRoutesByPath interface
 
@@ -94,11 +102,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appImport
       parentRoute: typeof rootRoute
     }
-    '/(app)/_dashboard': {
-      id: '/(app)/_dashboard'
+    '/(app)/_app': {
+      id: '/(app)/_app'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof appDashboardImport
+      preLoaderRoute: typeof appAppImport
       parentRoute: typeof appRoute
     }
     '/(auth)/login/': {
@@ -115,86 +123,108 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authRegisterIndexImport
       parentRoute: typeof rootRoute
     }
-    '/(app)/_dashboard/clients/': {
-      id: '/(app)/_dashboard/clients/'
+    '/(app)/_app/clients/$clientId': {
+      id: '/(app)/_app/clients/$clientId'
+      path: '/clients/$clientId'
+      fullPath: '/clients/$clientId'
+      preLoaderRoute: typeof appAppClientsClientIdRouteImport
+      parentRoute: typeof appAppImport
+    }
+    '/(app)/_app/clients/': {
+      id: '/(app)/_app/clients/'
       path: '/clients'
       fullPath: '/clients'
-      preLoaderRoute: typeof appDashboardClientsIndexImport
-      parentRoute: typeof appDashboardImport
+      preLoaderRoute: typeof appAppClientsIndexImport
+      parentRoute: typeof appAppImport
     }
-    '/(app)/_dashboard/dashboard/': {
-      id: '/(app)/_dashboard/dashboard/'
+    '/(app)/_app/dashboard/': {
+      id: '/(app)/_app/dashboard/'
       path: '/dashboard'
       fullPath: '/dashboard'
-      preLoaderRoute: typeof appDashboardDashboardIndexImport
-      parentRoute: typeof appDashboardImport
+      preLoaderRoute: typeof appAppDashboardIndexImport
+      parentRoute: typeof appAppImport
     }
-    '/(app)/_dashboard/clients/[clientId]/': {
-      id: '/(app)/_dashboard/clients/[clientId]/'
-      path: '/clients/[clientId]'
-      fullPath: '/clients/[clientId]'
-      preLoaderRoute: typeof appDashboardClientsclientIdIndexImport
-      parentRoute: typeof appDashboardImport
+    '/(app)/_app/clients/$clientId/': {
+      id: '/(app)/_app/clients/$clientId/'
+      path: '/'
+      fullPath: '/clients/$clientId/'
+      preLoaderRoute: typeof appAppClientsClientIdIndexImport
+      parentRoute: typeof appAppClientsClientIdRouteImport
     }
   }
 }
 
 // Create and export the route tree
 
-interface appDashboardRouteChildren {
-  appDashboardClientsIndexRoute: typeof appDashboardClientsIndexRoute
-  appDashboardDashboardIndexRoute: typeof appDashboardDashboardIndexRoute
-  appDashboardClientsclientIdIndexRoute: typeof appDashboardClientsclientIdIndexRoute
+interface appAppClientsClientIdRouteRouteChildren {
+  appAppClientsClientIdIndexRoute: typeof appAppClientsClientIdIndexRoute
 }
 
-const appDashboardRouteChildren: appDashboardRouteChildren = {
-  appDashboardClientsIndexRoute: appDashboardClientsIndexRoute,
-  appDashboardDashboardIndexRoute: appDashboardDashboardIndexRoute,
-  appDashboardClientsclientIdIndexRoute: appDashboardClientsclientIdIndexRoute,
+const appAppClientsClientIdRouteRouteChildren: appAppClientsClientIdRouteRouteChildren =
+  {
+    appAppClientsClientIdIndexRoute: appAppClientsClientIdIndexRoute,
+  }
+
+const appAppClientsClientIdRouteRouteWithChildren =
+  appAppClientsClientIdRouteRoute._addFileChildren(
+    appAppClientsClientIdRouteRouteChildren,
+  )
+
+interface appAppRouteChildren {
+  appAppClientsClientIdRouteRoute: typeof appAppClientsClientIdRouteRouteWithChildren
+  appAppClientsIndexRoute: typeof appAppClientsIndexRoute
+  appAppDashboardIndexRoute: typeof appAppDashboardIndexRoute
 }
 
-const appDashboardRouteWithChildren = appDashboardRoute._addFileChildren(
-  appDashboardRouteChildren,
-)
+const appAppRouteChildren: appAppRouteChildren = {
+  appAppClientsClientIdRouteRoute: appAppClientsClientIdRouteRouteWithChildren,
+  appAppClientsIndexRoute: appAppClientsIndexRoute,
+  appAppDashboardIndexRoute: appAppDashboardIndexRoute,
+}
+
+const appAppRouteWithChildren =
+  appAppRoute._addFileChildren(appAppRouteChildren)
 
 interface appRouteChildren {
-  appDashboardRoute: typeof appDashboardRouteWithChildren
+  appAppRoute: typeof appAppRouteWithChildren
 }
 
 const appRouteChildren: appRouteChildren = {
-  appDashboardRoute: appDashboardRouteWithChildren,
+  appAppRoute: appAppRouteWithChildren,
 }
 
 const appRouteWithChildren = appRoute._addFileChildren(appRouteChildren)
 
 export interface FileRoutesByFullPath {
-  '/': typeof appDashboardRouteWithChildren
+  '/': typeof appAppRouteWithChildren
   '/login': typeof authLoginIndexRoute
   '/register': typeof authRegisterIndexRoute
-  '/clients': typeof appDashboardClientsIndexRoute
-  '/dashboard': typeof appDashboardDashboardIndexRoute
-  '/clients/[clientId]': typeof appDashboardClientsclientIdIndexRoute
+  '/clients/$clientId': typeof appAppClientsClientIdRouteRouteWithChildren
+  '/clients': typeof appAppClientsIndexRoute
+  '/dashboard': typeof appAppDashboardIndexRoute
+  '/clients/$clientId/': typeof appAppClientsClientIdIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof appDashboardRouteWithChildren
+  '/': typeof appAppRouteWithChildren
   '/login': typeof authLoginIndexRoute
   '/register': typeof authRegisterIndexRoute
-  '/clients': typeof appDashboardClientsIndexRoute
-  '/dashboard': typeof appDashboardDashboardIndexRoute
-  '/clients/[clientId]': typeof appDashboardClientsclientIdIndexRoute
+  '/clients': typeof appAppClientsIndexRoute
+  '/dashboard': typeof appAppDashboardIndexRoute
+  '/clients/$clientId': typeof appAppClientsClientIdIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/(app)': typeof appRouteWithChildren
-  '/(app)/_dashboard': typeof appDashboardRouteWithChildren
+  '/(app)/_app': typeof appAppRouteWithChildren
   '/(auth)/login/': typeof authLoginIndexRoute
   '/(auth)/register/': typeof authRegisterIndexRoute
-  '/(app)/_dashboard/clients/': typeof appDashboardClientsIndexRoute
-  '/(app)/_dashboard/dashboard/': typeof appDashboardDashboardIndexRoute
-  '/(app)/_dashboard/clients/[clientId]/': typeof appDashboardClientsclientIdIndexRoute
+  '/(app)/_app/clients/$clientId': typeof appAppClientsClientIdRouteRouteWithChildren
+  '/(app)/_app/clients/': typeof appAppClientsIndexRoute
+  '/(app)/_app/dashboard/': typeof appAppDashboardIndexRoute
+  '/(app)/_app/clients/$clientId/': typeof appAppClientsClientIdIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -203,9 +233,10 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/register'
+    | '/clients/$clientId'
     | '/clients'
     | '/dashboard'
-    | '/clients/[clientId]'
+    | '/clients/$clientId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -213,17 +244,18 @@ export interface FileRouteTypes {
     | '/register'
     | '/clients'
     | '/dashboard'
-    | '/clients/[clientId]'
+    | '/clients/$clientId'
   id:
     | '__root__'
     | '/'
     | '/(app)'
-    | '/(app)/_dashboard'
+    | '/(app)/_app'
     | '/(auth)/login/'
     | '/(auth)/register/'
-    | '/(app)/_dashboard/clients/'
-    | '/(app)/_dashboard/dashboard/'
-    | '/(app)/_dashboard/clients/[clientId]/'
+    | '/(app)/_app/clients/$clientId'
+    | '/(app)/_app/clients/'
+    | '/(app)/_app/dashboard/'
+    | '/(app)/_app/clients/$clientId/'
   fileRoutesById: FileRoutesById
 }
 
@@ -263,16 +295,16 @@ export const routeTree = rootRoute
     "/(app)": {
       "filePath": "(app)",
       "children": [
-        "/(app)/_dashboard"
+        "/(app)/_app"
       ]
     },
-    "/(app)/_dashboard": {
-      "filePath": "(app)/_dashboard.tsx",
+    "/(app)/_app": {
+      "filePath": "(app)/_app.tsx",
       "parent": "/(app)",
       "children": [
-        "/(app)/_dashboard/clients/",
-        "/(app)/_dashboard/dashboard/",
-        "/(app)/_dashboard/clients/[clientId]/"
+        "/(app)/_app/clients/$clientId",
+        "/(app)/_app/clients/",
+        "/(app)/_app/dashboard/"
       ]
     },
     "/(auth)/login/": {
@@ -281,17 +313,24 @@ export const routeTree = rootRoute
     "/(auth)/register/": {
       "filePath": "(auth)/register/index.tsx"
     },
-    "/(app)/_dashboard/clients/": {
-      "filePath": "(app)/_dashboard/clients/index.tsx",
-      "parent": "/(app)/_dashboard"
+    "/(app)/_app/clients/$clientId": {
+      "filePath": "(app)/_app/clients/$clientId/route.tsx",
+      "parent": "/(app)/_app",
+      "children": [
+        "/(app)/_app/clients/$clientId/"
+      ]
     },
-    "/(app)/_dashboard/dashboard/": {
-      "filePath": "(app)/_dashboard/dashboard/index.tsx",
-      "parent": "/(app)/_dashboard"
+    "/(app)/_app/clients/": {
+      "filePath": "(app)/_app/clients/index.tsx",
+      "parent": "/(app)/_app"
     },
-    "/(app)/_dashboard/clients/[clientId]/": {
-      "filePath": "(app)/_dashboard/clients/[clientId]/index.tsx",
-      "parent": "/(app)/_dashboard"
+    "/(app)/_app/dashboard/": {
+      "filePath": "(app)/_app/dashboard/index.tsx",
+      "parent": "/(app)/_app"
+    },
+    "/(app)/_app/clients/$clientId/": {
+      "filePath": "(app)/_app/clients/$clientId/index.tsx",
+      "parent": "/(app)/_app/clients/$clientId"
     }
   }
 }
