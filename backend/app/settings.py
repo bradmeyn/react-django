@@ -69,15 +69,6 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
-    
-    # Add cookie settings
-    'AUTH_COOKIE_ACCESS': 'access_token',  # Cookie name for access token
-    'AUTH_COOKIE_REFRESH': 'refresh_token',  # Cookie name for refresh token
-    'AUTH_COOKIE_DOMAIN': None,  # Use None for standard domain cookie
-    'AUTH_COOKIE_SECURE': False,  # Set to True in production with HTTPS
-    'AUTH_COOKIE_HTTP_ONLY': True,  # Prevents JavaScript access
-    'AUTH_COOKIE_PATH': '/',  # Cookie path
-    'AUTH_COOKIE_SAMESITE': 'Lax',  # 'Lax', 'Strict', or 'None'
 }
 
 MIDDLEWARE = [
