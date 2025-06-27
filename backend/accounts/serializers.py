@@ -2,46 +2,63 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import Business
 from django.db import transaction
-from django.contrib.auth import authenticate
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 User = get_user_model()
-
-class BusinessRegistrationSerializer(serializers.ModelSerializer):
-    business_name = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
-    password = serializers.CharField(write_only=True)
-    first_name = serializers.CharField(required=True)
-    last_name = serializers.CharField(required=True)
-    phone = serializers.CharField(required=False)
-
-    class Meta:
-        model = User
-        fields = ['business_name', 'email', 'password', 'first_name', 
-                 'last_name', 'phone']
-
-    @transaction.atomic
-    def create(self, validated_data):
-        business_name = validated_data.pop('business_name')
-        # Create business
-        business = Business.objects.create(
-            name=business_name
-        )
-        # Create admin user
-        user = User.objects.create(
-            business=business,
-            **validated_data
-        )
-        user.set_password(validated_data['password'])
-        user.save()
-        
-        return user
 
 class BusinessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Business
         fields = ['id', 'name']
 
-class UserRegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+class UserSerializer(serializers.ModelSerializer):
+    business = BusinessSerializer(read_only=True)
+    
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'first_name', 'last_name', 'business', 'phone']
+
+class RegisterSerializer(serializers.ModelSerializer):
+    """For initial business signup - creates both business and admin user"""
+    business_name = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(write_only=True, min_length=8)
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    phone = serializers.CharField(required=False, allow_blank=True) 
+
+    class Meta:
+        model = User
+        fields = ['business_name', 'email', 'password', 'first_name', 
+                 'last_name', 'phone']
+
+    def validate_email(self, value):
+        """Check if email is already taken"""
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("User with this email already exists.")
+        return value
+
+    @transaction.atomic
+    def create(self, validated_data):
+        business_name = validated_data.pop('business_name')
+        password = validated_data.pop('password')
+        
+        # Create business first
+        business = Business.objects.create(name=business_name)
+        
+        # Create admin user
+        user = User.objects.create(
+            business=business,
+            **validated_data
+        )
+        user.set_password(password)
+        user.save()
+        
+        return user
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    """For creating additional users within an existing business"""
+    password = serializers.CharField(write_only=True, min_length=8) 
     business = BusinessSerializer(read_only=True)
     business_id = serializers.UUIDField(write_only=True)
 
@@ -50,6 +67,18 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'password', 'first_name', 'last_name', 
                  'business', 'business_id', 'phone']
         read_only_fields = ['id']
+
+    def validate_email(self, value):
+        """Check if email is already taken"""
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("User with this email already exists.")
+        return value
+
+    def validate_business_id(self, value):
+        """Check if business exists"""
+        if not Business.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Business not found.")
+        return value
 
     def create(self, validated_data):
         business_id = validated_data.pop('business_id')
@@ -65,31 +94,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         
         return user
 
-class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField()
-
-    def validate(self, data):
-        email = data.get('email')
-        password = data.get('password')
-
-        if email and password:
-            user = authenticate(request=self.context.get('request'), 
-                              username=email, password=password)
-            
-            if not user:
-                msg = 'Unable to log in with provided credentials.'
-                raise serializers.ValidationError(msg, code='authorization')
-        else:
-            msg = 'Must include "email" and "password".'
-            raise serializers.ValidationError(msg, code='authorization')
-
-        data['user'] = user
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        
+        # Add user data to the response
+        user_serializer = UserSerializer(self.user)
+        data['user'] = user_serializer.data
+        
         return data
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'email', 'first_name', 'last_name', 'business', 'phone']
-        # Don't include password in the returned data

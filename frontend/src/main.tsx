@@ -1,15 +1,12 @@
-import { AuthProvider, useAuth } from "@contexts/AuthContext";
-import { useEffect } from "react";
+import { AuthProvider, useAuth } from "@auth/context";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./index.css";
 
-// Create a query client
 const queryClient = new QueryClient();
 
-// Set up a Router instance
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",
@@ -17,6 +14,8 @@ const router = createRouter({
     auth: {
       user: null,
       isAuthenticated: false,
+      isLoading: false,
+      error: null,
     },
     queryClient,
   },
@@ -32,17 +31,20 @@ const rootElement = document.getElementById("app")!;
 
 function InnerApp() {
   const auth = useAuth();
+  return <RouterProvider router={router} context={{ auth, queryClient }} />;
+}
 
-  return <RouterProvider router={router} context={{ auth }} />;
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <InnerApp />
+      </AuthProvider>
+    </QueryClientProvider>
+  );
 }
 
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <InnerApp />
-      </QueryClientProvider>
-    </AuthProvider>
-  );
+  root.render(<App />);
 }

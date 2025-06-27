@@ -1,22 +1,28 @@
-import { Outlet, createFileRoute, Link } from "@tanstack/react-router";
+import {
+  Outlet,
+  createFileRoute,
+  Link,
+  useRouter,
+} from "@tanstack/react-router";
 import { Button } from "@components/ui/button";
 import {
   LayoutDashboard,
   Users,
   Bell,
   ChevronRight,
+  LogOut,
   User,
   Settings,
 } from "lucide-react";
 import { redirect } from "@tanstack/react-router";
-import { useAuth } from "@contexts/AuthContext";
+import { useAuth } from "@auth/context";
+
 import SearchDialog from "./_app/-components/SearchDialog";
 
 export const Route = createFileRoute("/(app)/_app")({
   component: ProtectedLayout,
   loader: ({ context, location }) => {
-    // Only redirect if not authenticated AND finished loading
-    if (!context.auth.isAuthenticated && !context.auth.loading) {
+    if (!context.auth.isAuthenticated) {
       throw redirect({
         to: "/login",
         search: {
@@ -28,9 +34,9 @@ export const Route = createFileRoute("/(app)/_app")({
 });
 
 export default function ProtectedLayout() {
-  const { user, loading } = useAuth();
+  const { user, isLoading } = useAuth();
   // Show loading state while auth is being determined
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
@@ -51,7 +57,7 @@ export default function ProtectedLayout() {
             to="/dashboard"
             className="flex items-center gap-2 text-lg font-semibold text-white"
           >
-            <span>{user.business.name}</span>
+            <span>{user?.firstName}</span>
           </Link>
           <button className="rounded-md p-1 hover:bg-slate-700 text-white">
             <ChevronRight size={16} />
@@ -84,6 +90,8 @@ export default function ProtectedLayout() {
                 <span className="text-sm">Clients</span>
               </Link>
             </nav>
+
+            <LogoutButton />
           </div>
         </div>
       </aside>
@@ -114,5 +122,34 @@ export default function ProtectedLayout() {
         </main>
       </div>
     </div>
+  );
+}
+
+function LogoutButton() {
+  const { logout } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // Navigate to login page after successful logout
+      router.navigate({ to: "/login" });
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Still navigate to login even if logout API call fails
+      // since tokens are cleared locally
+      router.navigate({ to: "/login" });
+    }
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      className="w-full flex items-center gap-3 py-2 px-3 rounded-md transition-colors hover:bg-slate-700 text-slate-300 hover:text-white justify-start"
+      onClick={handleLogout}
+    >
+      <LogOut size={18} className="text-slate-400" />
+      <span className="text-sm">Logout</span>
+    </Button>
   );
 }

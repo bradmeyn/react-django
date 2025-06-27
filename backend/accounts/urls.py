@@ -1,16 +1,15 @@
 from django.urls import path
-from .views import BusinessRegistrationView, UserCreateView
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from .views import BusinessRegistrationView, UserCreateView, CustomTokenObtainPairView, UserProfileView
+from rest_framework_simplejwt.views import TokenRefreshView
 
 
 urlpatterns = [
     # Public auth endpoints
-    path('register/', BusinessRegistrationView.as_view(), name='register'),  # For initial business signup
+    path('auth/register/', BusinessRegistrationView.as_view(), name='register'), 
+    path('auth/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'), 
+    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
-    # Protected endpoint for creating additional users
+    # Protected endpoints
     path('users/', UserCreateView.as_view(), name='create_user'),
-
-    # JWT token refresh endpoint
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('me/', UserProfileView.as_view(), name='user_profile'), 
 ]

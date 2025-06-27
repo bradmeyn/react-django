@@ -24,11 +24,10 @@ import { useState } from "react";
 // Form
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { loginSchema } from "@schemas/auth";
-import { login } from "@services/auth";
+import { loginSchema, type LoginCredentials } from "@auth/schemas";
+import { useAuth } from "@auth/context";
+import LoadingSpinner from "@/lib/components/ui/loading-spinner";
 
 export const Route = createFileRoute("/(auth)/login/")({
   component: LoginPage,
@@ -37,23 +36,9 @@ export const Route = createFileRoute("/(auth)/login/")({
 function LoginPage() {
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState("");
+  const { login, isLoading } = useAuth();
 
-  const mutation = useMutation({
-    mutationFn: login,
-    onSuccess: () => {
-      navigate({ to: "/dashboard" });
-    },
-    onError: (error) => {
-      console.error("Login error", error);
-      // Set error message to display to the user
-      setLoginError(
-        error.message ||
-          "Failed to sign in. Please check your credentials and try again."
-      );
-    },
-  });
-
-  const form = useForm<z.infer<typeof loginSchema>>({
+  const form = useForm<LoginCredentials>({
     resolver: zodResolver(loginSchema),
     mode: "onChange",
     defaultValues: {
@@ -62,16 +47,26 @@ function LoginPage() {
     },
   });
 
-  async function onSubmit(data: z.infer<typeof loginSchema>) {
-    setLoginError(""); // Clear any previous errors
-    mutation.mutate(data);
+  async function onSubmit(data: LoginCredentials) {
+    try {
+      setLoginError("");
+      await login(data);
+      navigate({ to: "/dashboard" });
+    } catch (error) {
+      console.error("Login error", error);
+      setLoginError(
+        error instanceof Error
+          ? error.message
+          : "Failed to sign in. Please check your credentials and try again."
+      );
+    }
   }
 
   return (
     <div className="min-h-screen bg-muted">
       <header className="py-6 px-8 border-b bg-background">
         <Link to="/" className="text-xl font-bold">
-          Rolodex
+          CRM
         </Link>
       </header>
 
@@ -142,13 +137,13 @@ function LoginPage() {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={
-                    !form.formState.isValid ||
-                    form.formState.isSubmitting ||
-                    mutation.isPending
-                  }
+                  disabled={!form.formState.isValid || isLoading}
                 >
-                  {mutation.isPending ? "Signing in..." : "Sign in"}
+                  {isLoading || form.formState.isSubmitting ? (
+                    <LoadingSpinner text="Signing in..." />
+                  ) : (
+                    "Sign in"
+                  )}
                 </Button>
               </form>
             </Form>

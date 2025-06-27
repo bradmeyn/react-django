@@ -24,15 +24,13 @@ import { Building2, Mail } from "lucide-react";
 // Form
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 
-import { registerSchema } from "@schemas/auth";
-import { register } from "@services/auth";
+import { registerSchema, type RegisterCredentials } from "@auth/schemas";
+import { useAuth } from "@auth/context";
 
 import { cn } from "@utils/shadcn";
+import LoadingSpinner from "@/lib/components/ui/loading-spinner";
 
 export const Route = createFileRoute("/(auth)/register/")({
   component: RegisterPage,
@@ -41,43 +39,35 @@ export const Route = createFileRoute("/(auth)/register/")({
 function RegisterPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { register, isLoading } = useAuth();
 
-  const { mutateAsync } = useMutation({
-    mutationFn: register,
-    onSuccess: () => {
-      navigate({ to: "/login" });
-    },
-    // Reset error when starting new mutation
-    onMutate: () => {
-      setErrorMessage(null);
-    },
-    onError: (error) => {
-      console.error(error);
-      setErrorMessage(error.message);
-    },
-  });
-
-  const form = useForm<z.infer<typeof registerSchema>>({
+  const form = useForm<RegisterCredentials>({
     resolver: zodResolver(registerSchema),
     mode: "onBlur",
+
     defaultValues: {
       email: "",
-      business_name: "",
       first_name: "",
       last_name: "",
+      business_name: "",
       password: "",
       confirm_password: "",
     },
   });
 
-  async function onSubmit(data: z.infer<typeof registerSchema>) {
+  async function onSubmit(data: RegisterCredentials) {
     try {
-      console.log("Registering user...");
-      console.log(data);
-      const result = await mutateAsync(data);
-      console.log(result);
+      setErrorMessage(null);
+
+      await register(data);
+
+      // Navigate to dashboard after successful registration (auto-logged in)
+      navigate({ to: "/dashboard" });
     } catch (error) {
-      console.error(error);
+      console.error("Registration error:", error);
+      setErrorMessage(
+        error instanceof Error ? error.message : "Registration failed"
+      );
     }
   }
 
@@ -229,13 +219,13 @@ function RegisterPage() {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={
-                    !form.formState.isValid ||
-                    form.formState.isSubmitting ||
-                    form.formState.isDirty
-                  }
+                  disabled={!form.formState.isValid || isLoading}
                 >
-                  Create business
+                  {isLoading || form.formState.isSubmitting ? (
+                    <LoadingSpinner text="Creating account..." />
+                  ) : (
+                    "Sign up"
+                  )}
                 </Button>
               </form>
             </Form>
